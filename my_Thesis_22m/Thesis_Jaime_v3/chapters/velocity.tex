@@ -33,7 +33,7 @@ XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\
 XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\\
 
-\st{ If the velocity is normalized close to the minimum high oscillations appear in all the joints, even for small $k$. If it is not normalized, better behavior is achieved but one must take care of choosing a small step size so the velocities are not too high. Because if they are too high the new position obtained may not lay on the null space.} \textcolor{green}{ HERE THE MINIMIZATION IS ACTUALLY FUCKED BECAUSE THE PROJECTOR IS NOT POSITIVE DEFINITE!!it is necessary to use Nemec's projector!!!} \textcolor{red}{With the normal method (without rotating gradient) the projector is often negative semidefinite so it maximizes when it should minimize, and the other way around.}
+\st{ If the velocity is normalized close to the minimum high oscillations appear in all the joints, even for small $k$. If it is not normalized, better behavior is achieved but one must take care of choosing a small step size so the velocities are not too high. Because if they are too high the new position obtained may not lay on the null space.} \textcolor{green}{ HERE THE MINIMIZATION IS ACTUALLY FUCKED BECAUSE THE PROJECTOR IS NOT POSITIVE DEFINITE!!it is necessary to use Nemec's projector!!!} \textcolor{red}{With the normal method (without rotating gradient) the projector is often negative semidefinite so it maximizes when it should minimize, and the other way around... \textbf{THE MINIMIZATION IS NOT ENSURED!!!}(as Nemec says)}
 
 
 \textbf{WITH THE GRADIENT PREROTATED BY $M^{-1}$:} \rewrite{rewrite this part} \\
@@ -526,6 +526,8 @@ A non-normalized velocity will be considered in  Chapter  \ref{ch:experiments}.
 
 \subsection{Decoupling Minimization for Joint Limit Avoidance}
 \label{subsec:wf_JLA}
+
+\textcolor{red}{READ $/media/Datos/VIDEOS_THESIS/Final_videos/JLA/JLA_weighting_plus_potential/NOTES!!!.TXT$ AND USE THE GRID FROM THE RR EXPERIMENT WITH THE PATH EXTENDED}
 It is interesting to see how the two-dimensional minimization problem can be divided in two one-dimensional minimization problems by switching the weighting factor in (\ref{eq:decoupling_q1}) and (\ref{eq:decoupling_q4}). Starting  $\mathrm{WF  = 0}$  one may minimize the reflected mass inside the self-motion manifold slice for the current linear axis position. Once the minimum in the self-motion manifold slice is found, the weighting factor is switched to $0$, and the minimum along the linear axis is searched for. These two steps are performed till a local minimum in both dimensions is found. 
 A minimum in both dimensions corresponds to a minimum on the grid. But not necessarily to the closest minimum, neither to the same minimum than the classic two-dimensional minimization gives. In  Fig.\ref{fig:1D} one can see how starting in the same configuration the strategy using this \textit{decoupling} (in black) and the original one without decoupling the minimization (in red), reach different local minima. In this example the minimum reached without decoupling strategy has a lower mass. But in other scenario it could be vice versa, i.e. the \textit{decoupling}  strategy reaches a lower minimum. 	Therefore, this is no criterion to compare both strategies.
 %
