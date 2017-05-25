@@ -78,14 +78,16 @@ where $\mathbf{J}_{nr}$ and $\mathbf{J}_{r}$ are the Jacobians associated to the
 where $\nabla m'_u(\mathbf{q})$ is the  two-dimensional reduced gradient.  It is clear to see that if $\mathbf{J}_{nr}$ does not lose rank, its inversion is much more efficient than the computation of the $\mathrm{8x8}$ pseudoinverse in the PG method. \\
 
 Implementing both methods, PG and RG, in a MATLAB script shows that, using the Moore-Penrose projector, the PG  requires approximately $2*10^{-3}$ s, while RG  needs only $2.5*10^{-4}$ s. The PG with the mass weighted projector needs approximately $3*10^{-3}$ s. The speed of convergence is hard to measure because the number of iterations to reach a minimum is different in both methods.
-As mentioned in \cite{reduced_gradient}, PG and RG converge in different directions as soon as the redundancy degree is more than one. In Fig.\ref{fig:diff_GD_v2} one can see how the three approaches lead to different minima.  In \cite{Nemec_2}, the mass weighted projector for PG, lead to good minimization when implementing it for obstacle avoidance. However, in the tested cases in this thesis, the descent direction using the Moore-Penrose pseudoinverse caused a less oscillatory behavior. And also the mass weighted projector tends to minimize poorly w.r.t. the linear axis, like it happened at torque level in Section \ref{sec:Gradientbasedminimization}.\rewrite{this has to be in corcondance with the the torque level} \\ 
+As mentioned in \cite{reduced_gradient}, PG and RG converge in different directions as soon as the redundancy degree is more than one. In Fig.\ref{fig:diff_GD_v2} one can see how the three approaches lead to different minima.  In \cite{Nemec_2}, the mass weighted projector for PG, lead to good minimization when implementing it for obstacle avoidance. 
+%However, in the tested cases in this thesis, the descent direction using the Moore-Penrose pseudoinverse caused a less oscillatory behavior. 
+However, the mass weighted projector tends to minimize poorly w.r.t. the linear axis, like it happened at torque level in Section \ref{sec:Gradientbasedminimization}.\rewrite{this has to be in corcondance with the the torque level}  Between RG and PG with the Moore-Penrose pseudoinverse there are not significant differences in the rate of convergence, since they reach minima not far from each other.  \\ 
 Being RG analytically simpler and numerically faster, this is the method chosen to continue in this thesis. 
 
 
 \begin{figure}[!htb]
 	\centerline{
 		\includegraphics[width=0.7\textwidth]{images/diff_GD_v2.pdf}}
-	\caption{Comparison of the trajectories using PG, with Moore-Penrose and mass weighted pseudoinverse, and RG.}
+	\caption{textcolor{red}{BIGGER FONT LEGEND WINDOWS.}Comparison of the trajectories using PG, with Moore-Penrose and mass weighted pseudoinverse, and RG.}
 	\label{fig:diff_GD_v2}
 \end{figure}
 
@@ -422,7 +424,7 @@ For the  remaining experiments no weighting is considered, which can be regarded
 \begin{figure}[!h]
 	\centering	
 	\subfigure[]{\label{fig:wf_1}}{\includegraphics[height=0.5\textwidth]{images/wf1.eps}} 	\subfigure[]{\label{fig:wf_0}}{\includegraphics[height=0.5\textwidth]{images/wf0.eps}} 	 	
-	\caption{Fig.\ref{fig:wf_1}: Minimization for weighting factor of 1 (only  linear axis motion). \\ Fig.\ref{fig:wf_0}: Minimization for weighting factor of 0 (only elbow motion). }
+	\caption{Fig.\ref{fig:wf_1}: textcolor{red}{BIGGER FONTS WINDOWS.} Minimization for weighting factor of 1 (only  linear axis motion). \\ Fig.\ref{fig:wf_0}: Minimization for weighting factor of 0 (only elbow motion). }
 	\label{fig:wf}
 \end{figure}
 
@@ -444,7 +446,7 @@ reaches zero, the minimization is done inside a self-motion manifold slice for c
 
 \begin{figure}[!htb]
 	\centering	
-	\subfigure[]{\label{fig:gradients_weird_case}}{\includegraphics[height=0.45\textwidth]{images/gradients_weird_case.eps}} 	\subfigure[]{\label{fig:velocities_weird_case}}{\includegraphics[height=0.45\textwidth]{images/velocities_weird_case.eps}} 	 	
+	\subfigure[]{\label{fig:gradients_weird_case}}{\includegraphics[height=0.46\textwidth]{images/gradients_weird_case.eps}} 	\subfigure[]{\label{fig:velocities_weird_case}}{\includegraphics[height=0.46\textwidth]{images/velocities_weird_case.eps}} 	 	
 	\caption{Fig.\ref{fig:gradients_weird_case}: Gradient of the reflected mass w.r.t. both redundant joints during the minimization. \\ Fig.\ref{fig:velocities_weird_case}: Normalized joint velocities before and after the minimum in a self-motion manifold is found. }
 	\label{fig:weird case}
 \end{figure} 
