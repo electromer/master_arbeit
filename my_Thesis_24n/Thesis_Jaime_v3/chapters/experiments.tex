@@ -7,11 +7,11 @@
 
 The experiments carried out can be divided into experiments where the end-effector (EE) is not moving  and others where the EE is following a trajectory. 
 For the static case end-effector (Section \ref{sec:static_case}), the three Cartesian directions are chosen to minimize the reflected mass . The goal of the tuning is to find a common set of parameters for the minimization along all three directions, including the effect of external forces. If accomplished, it would not be necessary to change the parameters of the controller when the robot changes its direction of motion.
-Also in this section the different strategies for joint limit avoidance are compared. Including the decoupling in the minimization  introduced in Section \ref{subsec:wf_JLA}. \textcolor{red}{THIS ONLY IF I HAVE EXTRA TIME, AND MAYBE COOL COMPARE WITH POTENTIALS USING OTHER PROJECTIONS.}
 
 
 
-For the dynamic cases (Section \ref{sec:dynamic_case}) the main {\color{red} delete "main" unless I have time to do more experiments and put them here}  experiment is the motion of the robot along the linear axis. This experiment is performned at low and high speeds, 0.2 and 1 m/s respectively. 
+
+For the dynamic cases (Section \ref{sec:dynamic_case}) the  experiment is the motion of the robot along the linear axis. This experiment is performned at low and high speeds, 0.2 and 1 $\mathrm{m/s}$ respectively. 
 The previously obtained sets of parameters for the static case are tested, at low and high speeds. The final goal is to find a set of parameters that performs well in all cases, and if possible, a common set of parameters for both approaches, numerical and analytical.
 Finally both approaches are tested integrated together with the SMU (Safe Motion Unit), which was introduced in Section \ref{sec:Samistuff}. 
 
@@ -109,10 +109,7 @@ In \cite{fabianthesis} the null space grid was tested with a step size down to 0
 
 
 
-\subsection{Joint Limit Avoidance}
 
-
-\textcolor{red}{\textbf{If I have time add a comparison between different JLA approaches. Including mine with minimization. Things worth to compare are the TCP movement and the interference between the low-priority tasks, with different null space projectors (augmented vs successive)}}
 
 
 
@@ -128,7 +125,7 @@ The motion consists in moving 60 cm the end-effector in the y-direction with Car
 The distance was not chosen larger because the original robot behavior tends to stretch completely the elbow leading to singularities. 
 %As explained in the previous section the minimization in z-direction caused the robotic arm to stretch too much, reaching singularities. Although setting higher conservative joints limits will avoid singularities the minimization is then very small and to show better the behavior of the controller we will limit the experiments to the case in y-direction. 
 %TODO:try to do minimization along x and z dynamic just to show that the previous parameters work} {\color{red} delete this paragraph  if I have time to do more experiments and put them here
- Firstly the previously obtained  parameters from Table 	\ref{table:table_SC} are tested at high speeds. This subset will be later tested at lower speeds. At high speeds a maximum velocity of 1 $m/s$ is achieved during the motion with a maximum acceleration of 10 $m/s^{2}$ and at lower speeds the maximum velocity is 0.2 $m/s$, with the same maximum acceleration.
+ Firstly the previously obtained  parameters from Table 	\ref{table:table_SC} are tested at high speeds. This subset will be later tested at lower speeds. At high speeds a maximum velocity of 1 $\mathrm{m/s}$ is achieved during the motion with a maximum acceleration of 10 $\mathrm{m/s^{2}}$ and at lower speeds the maximum velocity is 0.2 $\mathrm{m/s}$, with the same maximum acceleration.
 
 
 
@@ -168,14 +165,16 @@ To sum up the parameters for the dynamic case with the numerical approach are:
 It is necessary to mention that the velocity obtained in the algorithm is not normalized before  integration, but it is bounded instead. This is done because a normalized velocity shows a poor minimization for the dynamic cases when using both approaches. These may be solved by increasing the proportional gains significantly in the controller but then the control action causes oscillations close to the minimum because the error is  amplified. To keep these gains low and still achieve good dynamics the only option is to increase the step size and/or the number of iterations between each sent command. But these two parameters should be kept low as already explained. \\
 Non-normalized joint velocities are chosen instead. These velocities are higher far from the minimum which means better response when the minimum is changing, like it occurs when the end-effector moves, and small close to the minimum so no oscillations will appear. But still this velocity has to be limited properly to ensure that the robot will move inside the null space grid.  In \cite{fabianthesis} a normalized velocity with a step size ($DT$) up to 0.5 was used to test the integration error when creating the null space grid for a specific configuration. 
 In our case this step size ($DT$) to create the grid can be approximated to the step size ($dt$) used in the algorithm, times the velocity. Using a normalized velocity, in the worst case scenario there is a joint which position increases $DT$ after each step. So without normalizing the velocity we have to ensure that the joints' position have a maximum increase of $DT$ in order to integrate inside the null space grid with enough accuracy.
-The step size in the algorithm ($dt$) is 5e-3 s, which means that to stay under $DT=0.5$ the velocity has to be less than 100 ( $m/s$ for the linear axis and $rad/s$ for the rotational joints). In the experiments carried out this limit is never reached which concludes that the non-normalized velocity is an adequate choice. 
+The step size in the algorithm ($dt$) is 5e-3 s, which means that to stay under $DT=0.5$ the velocity has to be less than 100 ( $\mathrm{m/s}$ for the linear axis and $rad/s$ for the rotational joints). In the experiments carried out this limit is never reached which concludes that the non-normalized velocity is an adequate choice. 
 
 
 \subsection{Analytical Controller}
 
+\textcolor{red}{Attempting to smooth these peaks a rate delimiter was implemented but it slowed down the response of the controller making the minimization considerably worse. Therefore no rate delimiter is used at the output of the controller.}
+
 The same experiment is done in order to tune the controller using the analytical approach.
 Also here the proportional gains 10, 20, 30 and 100 are tested. In the static case a step size of 5e-3 s gave good results so this one would be initially tested here. Regarding the number of iterations here it is kept to the minimum ($n_{max}=2$) because, as in the static cases, this approach shows to be very sensitive to changes of this parameter.
-The desired mass is always zero as explained before. Like $\gamma$ is just scaling the step size we can simplify and set the step size to 5e-3 s and focus on tuning $\gamma$. Equivalent results to the ones from Fig.\ref{fig:mass_kp100dt5e-3} can be seen in Fig.\ref{fig:analyt_cm3} for the analytical case. By looking at this figure one might think that the same $\gamma$ of 1e-2 used for the static cases will yield a good optimization for this dynamic case because the peak is way lower than with the numerical approach and the minimum is found. But when doing a similar motion starting a bit farther from the minimum the effect of $\gamma$ is different, see Fig.\ref{fig:analyt_cm2}. In this second motion the minimum is not found and during the trajectory the peak is even higher than without controller what is something to avoid. This is because it starts farther from the minimum, with higher RG, what causes a fast motion at the beginning. The robot reaches a configuration where some of the joints reach their limits. This stops the minimization in a joint configuration that leads to high masses when the end-effector moves. These masses are higher than starting in the initial configuration without controller because it is like comparing two trajectories without controller with different starting points. Clearly no joint limit avoidance strategy is implemented in this experiment.
+The desired mass is always zero as explained before. Like $\gamma$ is just scaling the step size we can simplify and set the step size to 5e-3 s and focus on tuning $\gamma$. Equivalent results to the ones from \textcolor{red}{I HAVE TO MENTION THAT THIS IS WITHOUT JLA} Fig.\ref{fig:mass_kp100dt5e-3} can be seen in Fig.\ref{fig:analyt_cm3} for the analytical case. By looking at this figure one might think that the same $\gamma$ of 1e-2 used for the static cases will yield a good optimization for this dynamic case because the peak is way lower than with the numerical approach and the minimum is found. But when doing a similar motion starting a bit farther from the minimum the effect of $\gamma$ is different, see Fig.\ref{fig:analyt_cm2}. In this second motion the minimum is not found and during the trajectory the peak is even higher than without controller what is something to avoid. This is because it starts farther from the minimum, with higher RG, what causes a fast motion at the beginning. The robot reaches a configuration where some of the joints reach their limits. This stops the minimization in a joint configuration that leads to high masses when the end-effector moves. These masses are higher than starting in the initial configuration without controller because it is like comparing two trajectories without controller with different starting points. Clearly no joint limit avoidance strategy is implemented in this experiment.
 The $\gamma$ shall be selected low because it shows similar results in similar motions although the local minimum is not found. Its high sensitivity makes this approach at high speeds undesired.
 For lower proportional gains the effect of $\gamma$ is not so high so gains around 30 are preferred.
 For proportional gains of 30 the table \ref{table:dynamic_opt_values} shows the optimal values of the parameters for this experiment.
@@ -216,23 +215,22 @@ The parameters found for the static case work well at low speeds in both approac
 
 \section{Integration with SMU}
 
-The last section of this chapter treats the integration of the controller with the SMU (Safety Motion Unit). As already explained in Section \ref{sec:Samistuff} an algorithm was developed previously at DLR, which depending on the reflected inertia, velocity, and geometry at possible impact locations generates truly safe velocity bounds considering the dynamic properties of the manipulator and human injury. The controller is implemented together with this algorithm to prove that a safer motion and better performance is achieved when using the controller.
-For this experiment first we need to define the object what will be placed in the end-effector to test the performance of the controller.
+The last section of this chapter regards the integration of the controller with the Safety Motion Unit (SMU). Depending on the reflected inertia, velocity, and geometry at possible impact locations, the SMU generates truly safe velocity bounds considering the dynamic properties of the manipulator and human injury. The minimization controller is implemented together with the SMU to prove that a safe motion and better performance are achieved.
+For the experiment we first describe the end-effector to test the performance of the controller.
 
 
 \subsection{End-effector description}
-In \cite{sammi_paper} an end-effector composed of the
-considered primitives from the drop-testing experiments from the same paper was considered. For sake of simplicity the same end-effector will be used here with the controller.
-
-This end-effector , Fig.\ref{fig:EE_description}, is composed of 4 Points Of Interest (POI) attached to 4 different geometries: POI1 is attached to a small sphere, POI2, POI3 to the edge, and POI4 to the large sphere. 
-In this experiment the motion will be similar to the one done in the previous Section \ref{sec:dynamic_case}, where the robot is moving along the linear axis in both directions of the ${}^{0}_{}y$ axis. In this way both safety curves of POI1 and POI4 will be considered not considering here POI3 and POI4.
-In this experiment the robot shows a minimum around 5.4 kg. For this minimum the safety curves created in  \cite{sammi_paper} have a maximum permissible velocity over 1 $m/s$. These velocities in the real robot are not implementable. So the safety curves are modified to have lower maximum velocities in order to implement the controller in the real robot. Therefore new safety curves are created at lower speeds for demonstration purposes.
-
+In \cite{sammi_paper} an end-effector composed of the primitives from the drop-testing experiments from the same paper was considered. The same end-effector will be used here with the controller.\\
+%
+This end-effector, illustrated in  Fig.\ref{fig:EE_description}, is composed of four Points Of Interest (POI) attached to four different geometries: POI1 is attached to a small sphere, POI2, POI3 to the edge, and POI4 to the large sphere. 
+In the experiment, the motion will be similar to the one carried out in Section \ref{sec:dynamic_case}, where the robot is moving along the linear axis. In this way both safety curves of POI1 and POI4 will be considered not considering here POI2 and POI3.
+In this experiment the robot has a minimum at approx 5.4 kg. For this minimum the safety curves created in  \cite{sammi_paper} have a maximum permissible velocity over 1 $\mathrm{m/s}$. These velocities in the real robot are not implementable. Therefore, the safety curves are modified to have lower maximum velocities in order to implement the controller in the real robot. Therefore new safety curves are created at lower speeds for demonstration purposes.
 
 
 
 
-\begin{figure}[htb]
+
+\begin{figure}[t!]
 	\centerline{
 		\includegraphics[width=0.5\textwidth]{images/EE_description.png}}
 	\caption{POIs associated to the impactor primitives in the end-effector \cite{sammi_paper}}
@@ -241,7 +239,7 @@ In this experiment the robot shows a minimum around 5.4 kg. For this minimum the
 
 
 
-\begin{figure}[htb]
+\begin{figure}[t!]
 	\centerline{
 		\includegraphics[width=0.5\textwidth]{images/EE_in_real_robot.png}}
 	\caption{End-effector coordinates expressed in the world base frame for the experiment. The ${}^{0}_{}y$ axis points towards the small sphere primitive. \cite{sammi_paper}}
@@ -254,29 +252,29 @@ In this experiment the robot shows a minimum around 5.4 kg. For this minimum the
 
 \subsection{Results}
 
-In this test the robot is commanded to move the end-effector, without rotating it, 60 cm in the opposite direction of ${}^{0}_{}y$. Then when this position is reached is commanded to go to the original position, this time with positive velocity refered to the world frame coordinate ${}^{0}_{}y$.
-The whole motion is first done without controller and without velocity limitation from the SMU. Then in the second experiment the SMU is activated and the velocity of the robot is limited to ensure a safe motion depending on the POI. While moving in the opposite direction of ${}^{0}_{}y$ the small sphere is the point of interest and the safety curve associated to the POI1 is the one to consider and when coming back to the original position the bigger sphere and POI4 are the ones who define the new safety curve and the bounds of the velocity.
-In  Fig.\ref{fig:SmuExp_ErrMass_vmax05} one can see the different errors in the reflected mass for both motions. All of them start in a configuration different from a local minimum Fig.\ref{fig:SmuExp_ErrMass_CM2_POI1_vmax05}. But in Fig.\ref{fig:SmuExp_ErrMass_CM3_POI4_vmax05} the reflected mass is lower at the beginning with the controller, because it has been used in the previous motion. With the controller we always end close to the minimum and both approaches show very similar performance, what is to be expected from the experiments run in \ref{sec:dynamic_case}.
+For the first motion, the robot is commanded to move the end-effector, pure translation, 60 cm in the opposite direction of ${}^{0}_{}y$  (y-axis of the world base frame). When this position is reached the robot is commanded to go in the opposite direction to the original position.
+The whole motion is first done without controller and velocity limitation from the SMU. In the second experiment, the SMU is activated and the velocity of the robot is possibly limited to ensure a safe motion. During the first motion, the small sphere (POI1) defines the safety curve. Coming back to the original position the bigger sphere (POI4) defines the new safety curve and the bounds of the velocity.
+In  Fig. \ref{fig:SmuExp_ErrMass_vmax05} one can see the error in the reflected masses for these approaches. Meaning by error, the difference between the current reflected mass and the mass in the local minimum. At the beginning of the first motion (Fig. \ref{fig:SmuExp_ErrMass_CM2_POI1_vmax05}) the reflected mass with all approaches is the same since they start in the same configuration, but at the end of this motion the reflected mass is much lower using the controller. The masses at the end of the first motion, correspond to the masses at the beginning of the second motion (Fig. \ref{fig:SmuExp_ErrMass_CM3_POI4_vmax05}). The numerical and analytical approach show very similar performance, what is to be expected from the experiments run in Section \ref{sec:dynamic_case}.
 %
 %
 %
-\begin{figure}[htp!]
+\begin{figure}[htb!]
 	\centering	
 	\subfigure[]{\label{fig:SmuExp_ErrMass_CM2_POI1_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_ErrMass_CM2_POI1_vmax05_ubuntu.eps}} 	\subfigure[]{\label{fig:SmuExp_ErrMass_CM3_POI4_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_ErrMass_CM3_POI4_vmax05_ubuntu.eps}} 	
-	\caption{Error in the reflected masses for both motions when using the controller integrated with the SMU. The curves without controller and without SMU limitation are also depicted.}
+	\caption{Reflected masses over the local minimum using the controller integrated with the SMU. The curves without controller and  SMU limitation are also depicted. The first motion is moving along the linear axis 60 cm (Fig. \ref{fig:SmuExp_ErrMass_CM2_POI1_vmax05}), and the second one is going back to the original position (Fig. \ref{fig:SmuExp_ErrMass_CM2_POI1_vmax05}).}
 	\label{fig:SmuExp_ErrMass_vmax05}
 \end{figure}
 %
 %
-In Fig.\ref{fig:SmuExp_Vel_vmax05} the absolute value for the velocity in the end-effector is depicted for the same two motions. In Fig.\ref{fig:SmuExp_Vel_CM2_POI1_vmax05} it is easier to see the effect of the minimization, which allows the controller to move at higher velocities. As the mass is minimized the maximum allowed velocity is higher in the safety curve which causes the TCP to reach the final position in less time.
-In Fig.\ref{fig:SmuExp_SafetyCurve_vmax05} the reflected masses together with the corresponding velocities for each instant of the trajectory are depicted. Here it is easier to see the effect of the SMU limiting the velocity, and how the controller reduces the mass allowing a faster motion. The safety curves are also show.
+In Fig. \ref{fig:SmuExp_Vel_vmax05} the absolute value for the velocity in the end-effector is depicted. The controller minimizes the reflected mass, and the lower the mass the higher is the velocity limit. In Fig. \ref{fig:SmuExp_Vel_CM2_POI1_vmax05} one can see clearly how the velocities reached with the controller are higher than without the controller. This causes the end-effector to reach the final position in less time, which corresponds to the moment when the velocities drop to zero.
+In Fig. \ref{fig:SmuExp_SafetyCurve_vmax05} the reflected masses are depicted, together with the corresponding velocities for each instant of the trajectory. Here one can see the effect of the SMU limiting the velocity, and how the controller reduces the mass allowing a faster motion. The safety curves are also depicted.
 %
-The velocities go slightly over the allowed maximum. This is due to the performance of the interpolator.
+The velocities exceeded slightly  the allowed maximum. This is due to the performance of the interpolator.
 
 \begin{figure}[htp!]
 	\centering	
 	\subfigure[]{\label{fig:SmuExp_Vel_CM2_POI1_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_Vel_CM2_POI1_vmax05_ubuntu.eps}} 	\subfigure[]{\label{fig:SmuExp_Vel_CM3_POI4_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_Vel_CM3_POI4_vmax05_ubuntu.eps}} 	
-		\caption{Absolute velocities in the end-effector moving towards the world frame \ref{fig:SmuExp_Vel_CM2_POI1_vmax05} and moving in the positive direction of ${}^{0}_{}y$ \ref{fig:SmuExp_Vel_CM3_POI4_vmax05} . First is shown the standard motion of the robot, then with velocity limitation from the SMU and then with both the numerical and analytical approaches integrated together with the SMU.}
+		\caption{Absolute velocities in the end-effector moving along the linear axis 60 cm (Fig. \ref{fig:SmuExp_Vel_CM2_POI1_vmax05}), and moving back to the original position (Fig. \ref{fig:SmuExp_Vel_CM3_POI4_vmax05}). First is shown the standard motion of the robot, then with velocity limitation from the SMU and then with both the numerical and analytical approaches integrated together with the SMU.}
 	\label{fig:SmuExp_Vel_vmax05}
 \end{figure}
 
@@ -286,33 +284,26 @@ The velocities go slightly over the allowed maximum. This is due to the performa
 \begin{figure}[htp!]
 	\centering	
 	\subfigure[]{\label{fig:SmuExp_SafetyCurve_CM2_POI1_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_SafetyCurve_CM2_POI1_vmax05_thin_ubuntu.eps}} 	\subfigure[]{\label{fig:SmuExp_SafetyCurve_CM3_POI4_vmax05}}{\includegraphics[height=0.35\textwidth]{images/SMU_test_3/SmuExp_SafetyCurve_CM3_POI4_vmax05_thin_ubuntu.eps}} 	
-	\caption{Velocities of the EE and reflected masses of the robot during the motion in the negative direction of ${}^{0}_{}y$   (Fig.\ref{fig:SmuExp_SafetyCurve_CM2_POI1_vmax05}) and moving in the positive direction of ${}^{0}_{}y$  (Fig.\ref{fig:SmuExp_SafetyCurve_CM3_POI4_vmax05}.})
+	\caption{Velocities of the EE and reflected masses the end-effector, when the robot is moving along the linear axis 60 cm (Fig.\ref{fig:SmuExp_SafetyCurve_CM2_POI1_vmax05}), and moving back to the original position (Fig.\ref{fig:SmuExp_SafetyCurve_CM3_POI4_vmax05}). The safety curves for each motion are also depicted.}  
 	\label{fig:SmuExp_SafetyCurve_vmax05}
 \end{figure}
 
 
 \section{Discussion}
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
 
-\textcolor{red}{The analytical approach has shown to be more sensitive to the tuning due to its higher non-normalized velocities. However, a set of parameters that lead to good behavior in the tested scenarios has been found. If testing in other scenarios \rewrite{reprase this} shows that this set of parameters does not work or it is too sentitive an option to consider is a normalized velocity with higher nmax. For that somehow it has to be guaranteed that the robot will not go over a maximum in its trajectory to the goal position. This does not affect the computational efficiency since the computationally expensive approach is the numerical one cz it needs to compute 4 masses in each iteration. \rewrite{I have to mention before that the computational problem is the numerical approach only}}
 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
-XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX \\ 
-
-For the numerical approach the optimal parameters found at 1 $m/s$ work fine at lower speeds. At low speeds (0.2 $m/s$) a higher number of iterations (up to 20) and high Kp (up to 100) would give a bit better minimization (up to 20\% better) but still with these parameters the optimization is fine.
+For the numerical approach the optimal parameters found at high speeds (1 $\mathrm{m/s}$) work fine at lower speeds. At low speeds (0.2 $\mathrm{m/s}$) a higher number of iterations ($\mathrm{n_{max} \approx 20}$) and high gains ($\mathrm{K_p \approx 100}$) would give a bit better minimization (up to 20\% lower reflected mass). But still with these parameters the optimization is fine. \\
 %
-Unfortunately it has not been possible to obtain a common set of parameters that work fine for both approaches. For the analytical approach the parameters found at 1 $m/s$ do not perform well at lower speeds. At low speeds all parameters could be more or less the same but $\gamma$, which has to be at least 1e-2. At high speeds (1 $m/s$) a $\gamma$ of 1e-2 would require low step size and/or gains which again would not minimize well at low speeds. 
+ For the analytical approach, the parameters found at high speeds do not perform well at low speeds. At low speeds  $\gamma$ has to be at least 1e-2. At high speeds such high $\gamma$ causes very high torques, and some joints tend to reach their limit. The high sensitivity of the analytical approach is due to its higher non-normalized velocities. An alternative approach would be setting a higher $n_{max}$ with normalized velocities. Normalized velocities would make the tuning more robust since the velocity bounds are smaller, and the high number of iterations would ensure good dynamics. Using low $\mathrm{K_p}$  no oscillations would appear close to the minimum. And the computational efficiency would still allow real time capabilities, since this approach is not so computationally expensive as the numerical one.   \rewrite{I have to mention before that the computational problem is the numerical approach only}
+ However, for this alternative to be possible, one must ensure that there are not local maxima between the current configuration and the local minimum (see Fig. \ref{fig:bad_case_3d}).\\
 %
-At low speeds and in the static case the minimization is similar with both approaches but at high speeds the numerical is able to reach always the local minimum and this does not occur with the analytical. Also the numerical shows a more robust tuning being less sensitive to changes in the mass. For all this the numerical approach with the parameters from the table \ref{table:dynamic_opt_values} is chosen as the optimal controller.
+At low speeds and in the static case the minimization is similar with both approaches. In the tests carried out with the SMU both approaches showed good performance. The analytical one reached slightly lower values of the mass. 
 
 
 Regarding the damping, the rotational joints could easily be damped to reach critically damped behavior and the same values showed good performance in the dynamic cases at low speeds. The linear axis was more prone to overshoot and in the dynamic cases the factorization design and the double diagonalization design showed similar and better performance than the simple diagonal matrix even for high damping (D=10) of the linear axis. 
-Damping ratios in the range 0.2-0.3 lead to smooth behavior in the static case with only little overshoot but in the dynamic case the overshoot was too high which cause a poor minimization of the reflected mass. A damping ratio of 1 was finally chosen for both damping designs from \cite{alin_damping}.
-%
-As it was seen in Fig.	\ref{fig:analyt_cm2and3} if initial configuration is far or close to the minimum can suppose a difference for the minimization with the analytical approach. The numerical approach performed well in all tested scenarios, although a peak in the torques was present at the beginning of the motion when the error $(\mathbf{q}_{m_u}^\ast - \mathbf{q})$ was high. This peak is not a problem as long as it is bounded between $\pm 20 Nm$ but a smoother change in the torques would be desirable. Attempting to smooth these peaks a rate delimiter was implemented but it slowed down the response of the controller making the minimization considerably worse. Therefore no rate delimiter is used at the output of the controller.
+The Cartesian controller ads already enough damping to the rotational joints. And since they also have high friction, damping ratios in the range 0.2-0.3 are chosen for these joints. The linear axis needs higher damping, since it has an admittance interface with position controller. To avoid overshooting a damping ratio of 1 is finally chosen for both damping designs from \cite{alin_damping}.
 
+\textcolor{magenta}{As it was seen in Fig.	\ref{fig:analyt_cm2and3} if initial configuration is far or close to the minimum can suppose a difference for the minimization with the analytical approach. The numerical approach performed well in all tested scenarios, although a peak in the torques was present at the beginning of the motion when the error $(\mathbf{q}_{m_u}^\ast - \mathbf{q})$ was high. This peak is not a problem as long as it is bounded between $\pm 20 Nm$ but a smoother change in the torques would be desirable. Attempting to smooth these peaks a rate delimiter was implemented but it slowed down the response of the controller making the minimization considerably worse. Therefore no rate delimiter is used at the output of the controller.
+}
 
